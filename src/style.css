@@ -1,0 +1,39 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow: hidden;
+}
+.webql {
+  position: fixed;
+  top: 0;
+  left: 0;
+  outline: none;
+}
+
+.header {
+  position: absolute;
+  top: 30px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+h1, p {
+  z-index: 999;
+  color: #ffffff;
+  text-align: center;
+  width: 100%;
+  text-transform: uppercase;
+  font-size: 72px;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+p {
+  font-size: 22px;
+}
