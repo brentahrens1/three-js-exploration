@@ -31,7 +31,8 @@ const phone = textureLoader.load('./phone.png', (texture) => {
 doorColorTexture.colorSpace = THREE.SRGBColorSpace
 matcapTexture.colorSpace = THREE.SRGBColorSpace
 
-// Cursor
+// CURSOR
+
 const cursor = {
   x: 0,
   y:0
@@ -42,152 +43,109 @@ window.addEventListener('mousemove', (e) => {
   cursor.y = - (e.clientY / sizes.height - 0.5)
 })
 
-// Canvas
+// CANVAS
 const canvas = document.querySelector('canvas.webgl')
 
-// Scene
+// SCENE
+
 const scene = new THREE.Scene()
 
-const fontsLoader = new FontLoader()
+// GEOMETRY
 
-fontsLoader.load(
-  '/fonts/helvetiker_regular.typeface.json',
-  (font) => {
-    const textGeometry = new TextGeometry(
-      'Studio Wozzie',
-      {
-        font: font,
-        size: 0.5,
-        height: 0.2,
-        depth: 0,
-        curveSegments: 5,
-        bevelEnabled: true,
-        bevelThickness: 0.03,
-        bevelSize: 0.02,
-        bevelOffset: 0,
-        bevelSegments: 4
-      }
-    )
-
-    textGeometry.center()
-    
-    const textMaterial = new THREE.MeshStandardMaterial({color: "#39ff14"})
-    const text = new THREE.Mesh(textGeometry, textMaterial)
-    
-    // text.position.y = -1
-    // text.position.x = -1.8
-    scene.add(text)
-
-    const donutGeometry = new THREE.TorusGeometry(0.3, 0.2, 28, 45)
-    const donutMaterial = new THREE.MeshMatcapMaterial({matcap: matcapTexture2})
-
-    for (let i = 0; i < 200; i++) {
-      const donut = new THREE.Mesh(donutGeometry, donutMaterial)
-      donut.position.x = (Math.random() - 0.5) * 10
-      donut.position.y = (Math.random() - 0.5) * 10
-      donut.position.z = (Math.random() - 0.5) * 10
-
-      donut.rotation.x = Math.random() * Math.PI
-      donut.rotation.y = Math.random() * Math.PI
-
-      const scale = Math.random()
-      donut.scale.set(scale, scale, scale)
-      // scene.add(donut)
-    }
-  }
+const floor = new THREE.Mesh(
+  new THREE.PlaneGeometry(20,20),
+  new THREE.MeshStandardMaterial()
 )
 
-const material = new THREE.MeshStandardMaterial()
-// material.metalness = 0.7
-// material.roughness= 0.2
-material.map =  matcapTexture
-// material.aoMapIntensity = 1
-// material.displacementMap = doorHeightTexture
-// material.displacementScale = 0.1
-// material.metalnessMap = doorMetalnessTexture
-material.roughnessMap = doorRoughnessTexture
-material.transparent = true
-// material.alphaMap = doorAlphaTexture
-const materialTwo = new THREE.MeshStandardMaterial()
-materialTwo.map = phone
+floor.rotation.x = - Math.PI * 0.5
 
-// material.clearcoat = 1
-// material.clearcoatRoughness = 0
+scene.add(floor)
 
-// material.transmission = 1
-// material.ior = 1.5
-// material.thickness = 0.5
+const house = new THREE.Group()
 
-gui.add(material, 'metalness').min(0).max(1).step(0.0001)
-gui.add(material, 'roughness').min(0).max(1).step(0.0001)
+scene.add(house)
 
-// material.flatShading = true
-// material.map = doorColorTexture
-material.side = THREE.DoubleSide
-materialTwo.side = THREE.DoubleSide
-
-const sphere = new THREE.Mesh(
-  new THREE.SphereGeometry(0.5,16,16),
-  material
-)
-sphere.position.x = 1.5
-
-const plane = new THREE.Mesh(
-  new THREE.PlaneGeometry(1.5,3),
-  materialTwo
+const walls = new THREE.Mesh(
+  new THREE.BoxGeometry(4,2.5,4),
+  new THREE.MeshStandardMaterial()
 )
 
-const torus = new THREE.Mesh(
-  new THREE.TorusGeometry(0.3,0.2,16,32),
-  material
+walls.position.y = 1.25
+house.add(walls)
+
+const roof = new THREE.Mesh(
+  new THREE.ConeGeometry(3.5,1.5,4),
+  new THREE.MeshStandardMaterial()
 )
-torus.position.x = -1.5
+roof.position.y = 2.5 + 0.75
+roof.rotation.y = Math.PI * 0.25
+house.add(roof)
 
-plane.receiveShadow = true
+const door = new THREE.Mesh(
+  new THREE.PlaneGeometry(2.2,2.2),
+  new THREE.MeshStandardMaterial()
+)
 
-scene.add(torus, plane, sphere)
+door.position.y = 1
+door.position.z = 2 + 0.01
+house.add(door)
 
-torus.position.y = 1
-sphere.position.y = 1
-plane.position.y = 1
+const bushGeometry = new THREE.SphereGeometry(1,16,16)
+const bushMaterial = new THREE.MeshStandardMaterial()
 
-const ambientLight = new THREE.AmbientLight(0xfffffff, 1)
+const bush1 = new THREE.Mesh(bushGeometry, bushMaterial)
+bush1.scale.setScalar(0.5)
+bush1.position.set(0.8,0.2,2.2)
+
+const bush2 = new THREE.Mesh(bushGeometry, bushMaterial)
+bush2.scale.setScalar(0.25)
+bush2.position.set(1.4,0.1,2.1)
+
+const bush3 = new THREE.Mesh(bushGeometry, bushMaterial)
+bush3.scale.setScalar(0.4)
+bush3.position.set(- 0.8,0.1,2.2)
+
+const bush4 = new THREE.Mesh(bushGeometry, bushMaterial)
+bush4.scale.setScalar(0.15)
+bush4.position.set(- 1,0.05,2.6)
+house.add(bush1, bush2, bush3, bush4)
+
+//GRAVES
+
+const graveGeometry = new THREE.BoxGeometry(0.6, 0.8, 0.2)
+const graveMaterial = new THREE.MeshStandardMaterial()
+
+const graves = new THREE.Group()
+
+scene.add(graves)
+
+for (let i = 0; i < 30; i++) {
+  const angle = Math.random() * Math.PI * 2
+  const radius = 3 + Math.random() * 3
+  const x = Math.sin(angle) * radius
+  const z = Math.cos(angle) * radius
+
+  const grave = new THREE.Mesh(graveGeometry, graveMaterial)
+  grave.position.x = x
+  grave.position.y = Math.random() * 0.4
+  grave.position.z = z
+  grave.rotation.x = (Math.random() - 0.5) * 0.4
+  grave.rotation.y = (Math.random() - 0.5) * 0.4
+  grave.rotation.z = (Math.random() - 0.5) * 0.4
+  graves.add(grave)
+}
+
+// LIGHTS
+
+const ambientLight = new THREE.AmbientLight('#ffffff', 0.5)
 scene.add(ambientLight)
 
-const pointLight = new THREE.PointLight(0xfffffff, 30)
-pointLight.position.x = 2
-pointLight.position.y = 3
-pointLight.position.z = 4
-scene.add(pointLight)
+const directionalLight = new THREE.DirectionalLight('#ffffff', 1.5)
+directionalLight.position.set(3,2,-8)
+scene.add(directionalLight)
 
-const directionalLight = new THREE.DirectionalLight('blue', 10)
-directionalLight.castShadow = true
-directionalLight.position.set(1, 0.25, 0)
-const hemisphereLight = new THREE.HemisphereLight(0xff0000, 0x0000ff, 20)
-// scene.add(directionalLight)
-// scene.add(ambientLight)
-// scene.add(hemisphereLight)
-// const pointLight = new THREE.PointLight(0xff0000, 5)
-// scene.add(pointLight)
+// SIZES
 
-const rectAreaLight = new THREE.RectAreaLight('green',10,1,1)
-rectAreaLight.position.set(- 1.5, 0, 1.5)
-rectAreaLight.lookAt(new THREE.Vector3())
-// scene.add(rectAreaLight)
-
-const spotLight = new THREE.SpotLight(0x78ff00, 4.5, 10, Math.PI * 0.1, 0.25, 1)
-scene.add(spotLight)
-const rgbeLoader = new RGBELoader()
-rgbeLoader.load('./environment-map/evening_field_2k.hdr', (envMap) => {
-  envMap.mapping = THREE.EquirectangularReflectionMapping
-
-  scene.background = envMap
-  scene.environment = envMap
-})
-
-/**
- * Sizes
- */
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
@@ -211,11 +169,10 @@ window.addEventListener("dblclick", () => {
     document.exitFullscreen()
   }
 })
-/**
- * Camera
- */
+
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
-camera.position.z = 4
+camera.position.z = 20
+camera.position.y = 2
 
 scene.add(camera)
 
@@ -233,19 +190,7 @@ const clock = new THREE.Clock()
 const tick = () => {
   const elapsedTime = clock.getElapsedTime()
 
-  sphere.rotation.y = 0.6 * elapsedTime
-  // plane.rotation.y = 0.6 * elapsedTime
-  torus.rotation.y = 0.6 * elapsedTime
-  sphere.rotation.x = - 0.6 * elapsedTime
-  // plane.rotation.x = - 0.6 * elapsedTime
-  torus.rotation.x = - 0.6 * elapsedTime
-
   controls.update()
-
-  // camera.position.x = Math.sin(cursor.x * Math.PI * 2) * 3
-  // camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 3
-  // camera.position.y = cursor.y * 5
-  // camera.lookAt(mesh.position)
 
   renderer.render(scene, camera)
 
